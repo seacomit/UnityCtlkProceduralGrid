@@ -13,10 +13,10 @@ public class Grid : MonoBehaviour
 
     private void Awake()
     {
-        StartCoroutine(Generate());
+        Generate();
     }
 
-    private IEnumerator Generate()
+    private void Generate()
     {
         WaitForSeconds wait = new WaitForSeconds(0.05f);
 
@@ -29,7 +29,6 @@ public class Grid : MonoBehaviour
             for (int x = 0; x <= xSize; x++, i++)
             {
                 vertices[i] = new Vector3(x, y);
-                yield return wait;
             }
         }
         mesh.vertices = vertices;
@@ -43,20 +42,19 @@ public class Grid : MonoBehaviour
         triangles[5] = xSize + 2;*/
 
         int[] triangles = new int[xSize * ySize * 6];
-        for (int y = 0; y < ySize; y++)
+        for (int ti = 0, vi = 0, y = 0; y < ySize; y++, vi++)
         {
-            for (int x = 0; x < xSize; x++)
+            for (int x = 0; x < xSize; x++, ti += 6, vi++)
             {
-                int ti = x * 6 + (y * xSize * 6);
-                int vi = x + (y * (xSize + 1));
                 triangles[ti] = vi;
                 triangles[ti + 1] = triangles[ti + 4] = xSize + vi + 1;
                 triangles[ti + 2] = triangles[ti + 3] = vi + 1;
                 triangles[ti + 5] = xSize + vi + 2;
-                mesh.triangles = triangles;
-                yield return wait;
             }
         }
+
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
     }
 
     private void OnDrawGizmos()
